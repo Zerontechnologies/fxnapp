@@ -169,6 +169,10 @@
                 "value": "[reference(resourceId('microsoft.insights/components', variables('applicationInsightsName')), '2020-02-02-preview').InstrumentationKey]"
               },
               {
+                "name": "APPLICATIONINSIGHTS_CONNECTION_STRING",
+                "value": "[reference(resourceId('microsoft.insights/components', variables('applicationInsightsName')), '2015-05-01').ConnectionString]"
+              },
+              {
                 "name": "FUNCTIONS_WORKER_RUNTIME",
                 "value": "dotnet"
               },
