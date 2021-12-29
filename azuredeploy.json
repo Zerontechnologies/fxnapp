@@ -22,6 +22,12 @@
         "description": "Name for the App Service Plan, defaulting to the value of the App Service's name with 'Plan' appended to the end"
       }
     },
+    "storageAccountName": {
+      "type": "string",
+      "metadata": {
+        "description": "Name for the storage account"
+      }
+    },
     "sku": {
       "type": "string",
       "allowedValues": [
@@ -97,7 +103,7 @@
     "functionAppName": "[parameters('functionAppName')]",
     "hostingPlanName": "[parameters('appServicePlanName')]",
     "applicationInsightsName": "[parameters('functionAppName')]",
-    "storageAccountName": "[concat(uniquestring(resourceGroup().id), 'functions')]"
+    "storageAccountName": "[parameters('storageAccountName')]"
   },
   "resources": [
     {
