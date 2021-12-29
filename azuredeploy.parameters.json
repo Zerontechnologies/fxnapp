@@ -16,6 +16,8 @@
     },
     "storageAccountName": {
       "value": "pplzstamworkop-q"
-    }
+    },
+    "servicePlanResourceGroupName": {
+      "value":  "pplz-migra-RG"
   }
 }
