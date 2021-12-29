@@ -13,6 +13,9 @@
     },
     "sku": {
       "value": "S1"
+    },
+    "storageAccountName": {
+      "value": "pplzstamworkop-q"
     }
   }
 }
