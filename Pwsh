@@ -1,0 +1,2 @@
+Set-AzStorageAccount -AccountName $stoAccountName -ResourceGroupName $resourceGroupName -AllowBlobPublicAccess $false
+ 
