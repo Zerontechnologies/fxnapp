@@ -196,7 +196,8 @@
       "location": "[parameters('location')]",
       "kind": "Storage",
       "properties": {
-            "allowBlobPublicAccess": false
+            "allowBlobPublicAccess": false,
+            "minimumTlsVersion": "TLS1_2"
       },
       "sku": {
         "name": "[parameters('storageAccountType')]"
