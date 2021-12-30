@@ -195,6 +195,9 @@
       "apiVersion": "2019-06-01",
       "location": "[parameters('location')]",
       "kind": "Storage",
+      "properties": {
+            "allowBlobPublicAccess": false
+      },
       "sku": {
         "name": "[parameters('storageAccountType')]"
       }
