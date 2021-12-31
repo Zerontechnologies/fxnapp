@@ -3,21 +3,19 @@
   "contentVersion": "1.0.0.0",
   "parameters": {
     "functionAppName": {
-      "value": "timpplzfxnnew"
-    },
-    "appInsightsLocation":{
-      "value": "eastus"
+      "value": "timpplzfxnnewt"
     },
     "appServicePlanName": {
-      "value": "timpplzfxn"
+      "value": "tempasp"
+    },
+    "applicationInsightsName":{
+      "value": "timpplzfxnnewt"
     },
     "sku": {
-      "value": "S1"
+      "value": "F1"
     },
     "storageAccountName": {
-      "value": "pplzstamworkop-q"
-    },
-    "servicePlanResourceGroupName": {
-      "value":  "pplz-migra-RG"
+      "value": "pplzstamworkouq"
+    }
   }
 }
