@@ -1,23 +1,23 @@
 {
-  "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+  "$schema": "http://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
   "contentVersion": "1.0.0.0",
   "parameters": {
     "functionAppName": {
       "type": "string",
       "metadata": {
-        "description": "The name of the function app that you wish to create."
+        "description": "Name of the Function App resource"
       }
     },
-    "createOrUpdateAppServicePlan": {
+    "createOrUpdateServicePlan": {
       "type": "bool",
       "defaultValue": false,
       "metadata": {
-        "description": "If set to false, provide the name and resource group of an existing service plan in the 'appServicePlanName' and 'servicePlanResourceGroupName' parameters. Otherwise a new plan will be created with the supplied name"
+        "description": "If set to false, provide the name and resource group of an existing service plan in the 'catalogServicePlanName' and 'servicePlanResourceGroupName' parameters. Otherwise a new plan will be created with the supplied name"
       }
     },
     "appServicePlanName": {
       "type": "string",
-      "defaultValue": "[concat(parameters('functionAppName'),'Plan')]",
+      "defaultValue": "tempasp",
       "metadata": {
         "description": "Name for the App Service Plan, defaulting to the value of the App Service's name with 'Plan' appended to the end"
       }
@@ -31,8 +31,8 @@
     "sku": {
       "type": "string",
       "allowedValues": [
-        "D1",
         "F1",
+        "D1",
         "B1",
         "B2",
         "B3",
@@ -42,20 +42,17 @@
         "P1",
         "P2",
         "P3",
-        "P1V2",
-        "P2V2",
-        "P3V2",
+        "P4",
         "I1",
-        "I2",
-        "I3",
-        "Y1"
+        "I2"
       ],
       "metadata": {
-        "description": "The pricing tier for the hosting plan."
+        "description": "Describes plan's pricing tier and capacity. Check details at https://azure.microsoft.com/en-us/pricing/details/app-service/"
       }
     },
     "servicePlanResourceGroupName": {
       "type": "string",
+      "defaultValue": "pplz-amworkop-rg-q",
       "metadata": {
         "description": "Optional name of the resource group for the existing app service plan. If creating a new plan, leave as the default value"
       }
@@ -84,25 +81,16 @@
         "description": "Storage Account type"
       }
     },
-    "location": {
-      "type": "string",
-      "defaultValue": "[resourceGroup().location]",
-      "metadata": {
-        "description": "Location for all resources."
-      }
-    },
-    "appInsightsLocation": {
+    "applicationInsightsName": {
       "type": "string",
       "metadata": {
-        "description": "Location for Application Insights"
+        "description": "Name of the application Insight"
       }
     }
   },
   "variables": {
-    "functionAppName": "[parameters('functionAppName')]",
-    "hostingPlanName": "[parameters('appServicePlanName')]",
-    "applicationInsightsName": "[parameters('functionAppName')]",
-    "storageAccountName": "[parameters('storageAccountName')]"
+    "use32Bit": "[or(equals(parameters('sku'), 'F1'), equals(parameters('sku'), 'D1'))]",
+    "appServicePlanName": "[if(empty(parameters('appServicePlanName')), concat(parameters('functionAppName'),'Plan'), parameters('appServicePlanName'))]"
   },
   "resources": [
     {
@@ -111,93 +99,96 @@
       "type": "Microsoft.Resources/deployments",
       "properties": {
         "mode": "Incremental",
-          "template": {
-            "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
-            "contentVersion": "1.0.0.0",
-            "resources": []
-          }
+        "template": {
+          "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+          "contentVersion": "1.0.0.0",
+          "resources": []
         }
-      },
-      {
-        "condition": "[parameters('createOrUpdateAppServicePlan')]",
-        "name": "AppServicePlanTemplate",
-        "apiVersion": "2017-05-10",
-        "type": "Microsoft.Resources/deployments",
-        "resourceGroup": "[parameters('servicePlanResourceGroupName')]",
-        "properties": {
-          "mode": "Incremental",
-          "template": {
-            "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
-            "contentVersion": "1.0.0.0",
-            "resources": [
-              {
-                "name": "[variables('appServicePlanName')]",
-                "type": "Microsoft.Web/serverfarms",
-                "apiVersion": "2016-09-01",
-                "location": "[resourceGroup().location]",
-                "properties": {
-                  "name": "[variables('hostingPlanName')]",
-                  "workerSize": "[parameters('workerSize')]",
-                  "numberOfWorkers": 1
-                },
-                "sku": {
-                  "name": "[parameters('sku')]"
-                }
-              }
-            ]
-          }
-        }
-      },
-      {
-        "apiVersion": "2020-06-01",
-        "type": "Microsoft.Web/sites",
-        "name": "[variables('functionAppName')]",
-        "location": "[parameters('location')]",
-        "kind": "functionapp",
-        "dependsOn": [
-          "[resourceId(parameters('servicePlanResourceGroupName'), 'Microsoft.Resources/deployments', 'AppServicePlanTemplate')]",
-          "[resourceId('Microsoft.Storage/storageAccounts', variables('storageAccountName'))]"
-        ],
-        "properties": {
-          "name": "[variables('functionAppName')]",
-          "serverFarmId": "[resourceId('Microsoft.Web/serverfarms', variables('hostingPlanName'))]",
-          "clientAffinityEnabled": false,
-          "siteConfig": {
-            "alwaysOn": true,
-            "appSettings": [
-              {
-                "name": "AzureWebJobsStorage",
-                "value": "[concat('DefaultEndpointsProtocol=https;AccountName=', variables('storageAccountName'), ';EndpointSuffix=', environment().suffixes.storage, ';AccountKey=',listKeys(resourceId('Microsoft.Storage/storageAccounts', variables('storageAccountName')), '2019-06-01').keys[0].value)]"
-              },
-              {
-                "name": "APPINSIGHTS_INSTRUMENTATIONKEY",
-                "value": "[reference(resourceId('microsoft.insights/components', variables('applicationInsightsName')), '2020-02-02-preview').InstrumentationKey]"
-              },
-              {
-                "name": "APPLICATIONINSIGHTS_CONNECTION_STRING",
-                "value": "[reference(resourceId('microsoft.insights/components', variables('applicationInsightsName')), '2015-05-01').ConnectionString]"
-              },
-              {
-                "name": "FUNCTIONS_WORKER_RUNTIME",
-                "value": "dotnet"
-              },
-              {
-                "name": "FUNCTIONS_EXTENSION_VERSION",
-                "value": "~4"
-              }
-            ]
-          }
-        }
-      },
-      {
-      "type": "Microsoft.Storage/storageAccounts",
-      "name": "[variables('storageAccountName')]",
-      "apiVersion": "2019-06-01",
-      "location": "[parameters('location')]",
-      "kind": "Storage",
+      }
+    },
+    {
+      "condition": "[parameters('createOrUpdateServicePlan')]",
+      "name": "AppServicePlanTemplate",
+      "apiVersion": "2017-05-10",
+      "type": "Microsoft.Resources/deployments",
+      "resourceGroup": "[parameters('servicePlanResourceGroupName')]",
       "properties": {
-            "allowBlobPublicAccess": false,
-            "minimumTlsVersion": "TLS1_2"
+        "mode": "Incremental",
+        "template": {
+          "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+          "contentVersion": "1.0.0.0",
+          "resources": [
+            {
+              "name": "[variables('appServicePlanName')]",
+              "type": "Microsoft.Web/serverfarms",
+              "apiVersion": "2016-09-01",
+              "location": "[resourceGroup().location]",
+              "properties": {
+                "name": "[variables('appServicePlanName')]",
+                "workerSize": "[parameters('workerSize')]",
+                "numberOfWorkers": 1
+              },
+              "sku": {
+                "name": "[parameters('sku')]"
+              }
+            }
+          ]
+        }
+      }
+    },
+    {
+      "name": "[parameters('functionAppName')]",
+      "type": "Microsoft.Web/sites",
+      "apiVersion": "2016-08-01",
+      "location": "[resourceGroup().location]",
+      "kind": "functionapp",
+      "dependsOn": [
+        "[resourceId(parameters('servicePlanResourceGroupName'), 'Microsoft.Resources/deployments', 'AppServicePlanTemplate')]",
+        "[resourceId('Microsoft.Storage/storageAccounts', parameters('storageAccountName'))]"
+      ],
+      "tags": {
+        "[concat('hidden-related:', resourceId(parameters('servicePlanResourceGroupName'), 'Microsoft.Web/serverfarms', variables('appServicePlanName')))]": "Resource"
+      },
+      "properties": {
+        "name": "[parameters('functionAppName')]",
+        "serverFarmId": "[resourceId(parameters('servicePlanResourceGroupName'), 'Microsoft.Web/serverfarms', variables('appServicePlanName'))]",
+        "clientAffinityEnabled": false,
+        "siteConfig": {
+          "alwaysOn": true,
+          "appSettings": [
+            {
+              "name": "AzureWebJobsStorage",
+              "value": "[concat('DefaultEndpointsProtocol=https;AccountName=', parameters('storageAccountName'), ';EndpointSuffix=', environment().suffixes.storage, ';AccountKey=',listKeys(resourceId('Microsoft.Storage/storageAccounts', parameters('storageAccountName')), '2019-06-01').keys[0].value)]"
+            },
+            {
+              "name": "APPINSIGHTS_INSTRUMENTATIONKEY",
+              "value": "[reference(resourceId('microsoft.insights/components', parameters('applicationInsightsName')), '2020-02-02-preview').InstrumentationKey]"
+            },
+            {
+              "name": "APPLICATIONINSIGHTS_CONNECTION_STRING",
+              "value": "[reference(resourceId('microsoft.insights/components', parameters('applicationInsightsName')), '2015-05-01').ConnectionString]"
+            },
+            {
+              "name": "FUNCTIONS_WORKER_RUNTIME",
+              "value": "dotnet"
+            },
+            {
+              "name": "FUNCTIONS_EXTENSION_VERSION",
+              "value": "~4"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "type": "Microsoft.Storage/storageAccounts",
+      "name": "[parameters('storageAccountName')]",
+      "apiVersion": "2019-06-01",
+      "location": "[resourceGroup().location]",
+      "kind": "StorageV2",
+      "properties": {
+        "allowBlobPublicAccess": false,
+        "minimumTlsVersion": "TLS1_2"
       },
       "sku": {
         "name": "[parameters('storageAccountType')]"
@@ -206,13 +197,13 @@
     {
       "type": "microsoft.insights/components",
       "apiVersion": "2020-02-02-preview",
-      "name": "[variables('applicationInsightsName')]",
-      "location": "[parameters('appInsightsLocation')]",
+      "name": "[parameters('functionAppName')]",
+      "location": "[resourceGroup().location]",
       "tags": {
-        "[concat('hidden-link:', resourceId('Microsoft.Web/sites', variables('applicationInsightsName')))]": "Resource"
+        "[concat('hidden-link:', resourceId('Microsoft.Web/sites', parameters('applicationInsightsName')))]": "Resource"
       },
       "properties": {
-        "ApplicationId": "[variables('applicationInsightsName')]",
+        "ApplicationId": "[parameters('applicationInsightsName')]",
         "Request_Source": "IbizaWebAppExtensionCreate"
       }
     }
