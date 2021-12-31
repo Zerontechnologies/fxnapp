@@ -197,7 +197,7 @@
     {
       "type": "microsoft.insights/components",
       "apiVersion": "2020-02-02-preview",
-      "name": "[parameters('functionAppName')]",
+      "name": "[parameters('applicationInsightsName')]",
       "location": "[resourceGroup().location]",
       "tags": {
         "[concat('hidden-link:', resourceId('Microsoft.Web/sites', parameters('applicationInsightsName')))]": "Resource"
