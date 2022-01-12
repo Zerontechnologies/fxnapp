@@ -59,7 +59,7 @@
       "type": "Microsoft.Logic/workflows",
       "location": "[parameters('logicAppLocation')]",
       "dependsOn": [
-        "[resourceId(parameters('isePlanResourceGroupName')]"
+        "[resourceId(parameters('iseResourceGroupName')]"
       ],
       "integrationServiceEnvironment": {
         "name": "US-QC-ISE",
