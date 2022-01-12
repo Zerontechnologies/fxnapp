@@ -10,6 +10,13 @@
         "description": "Name of the Logic App."
       }
     },
+    "iseResourceGroupName": {
+      "type": "string",
+      "defaultValue": "pplz-amworkop-rg-q",
+      "metadata": {
+        "description": "Optional name of the resource group for the existing app service plan. If creating a new plan, leave as the default value"
+      }
+    },
     "logicAppLocation": {
       "type": "string",
       "defaultValue": "[resourceGroup().location]",
@@ -51,6 +58,9 @@
       "name": "[parameters('logicAppName')]",
       "type": "Microsoft.Logic/workflows",
       "location": "[parameters('logicAppLocation')]",
+      "dependsOn": [
+        "[resourceId(parameters('isePlanResourceGroupName')]"
+      ],
       "integrationServiceEnvironment": {
         "name": "US-QC-ISE",
         "id": "/subscriptions/XXXXXXXX/XXXXXXXXX/Microsoft.Logic/integrationServiceEnvironments/US-QC-ISE",
