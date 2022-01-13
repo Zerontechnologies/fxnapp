@@ -18,25 +18,25 @@
         "description": "Location of the Logic App."
       }
     },
-    "createOrUpdateServicePlan": {
+    "createOrUpdate": {
       "type": "bool",
       "defaultValue": false,
       "metadata": {
-        "description": "If set to false, provide the name and resource group of an existing service plan in the 'catalogServicePlanName' and 'servicePlanResourceGroupName' parameters. Otherwise a new plan will be created with the supplied name"
+        "description": "If set to false, provide the name and resource group of an existing in the iseResourceGroupName"
       }
     },
     "iseName": {
       "type": "string",
       "defaultValue": "pplzise",
       "metadata": {
-        "description": "Name for the App Service Plan, defaulting to the value of the App Service's name with 'Plan' appended to the end"
+        "description": "Name for the ISE"
       }
     },
     "iseResourceGroupName": {
         "type": "string",
         "defaultValue": "pplz-rg-iase-1d",
         "metadata": {
-            "description": "Optional name of the resource group for the existing app service plan. If creating a new plan, leave as the default value"
+            "description": "Optional name of the resource group for the existing ISE"
         }
     }
   },
@@ -136,7 +136,7 @@
                   }
                 },
                 "method": "post",
-                "path": "/subscriptions/@{encodeURIComponent('<sub-id>')}/resourcegroups/@{encodeURIComponent('pplz-rg-iase-1d')}/providers/Microsoft.Web/sites/@{encodeURIComponent('pplzapp')}/restart",
+                "path": "/subscriptions/@{encodeURIComponent('9606f0a1-4502-4c86-8f75-660af3fdb023')}/resourcegroups/@{encodeURIComponent('pplz-rg-iase-1d')}/providers/Microsoft.Web/sites/@{encodeURIComponent('pplzapp')}/restart",
                 "queries": {
                   "api-version": "2019-08-01"
                 }
@@ -149,9 +149,9 @@
           "$connections": {
             "value": {
               "azureappservice": {
-                "connectionId": "/subscriptions/<sub-id>/resourceGroups/pplz-rg-iase-1d/providers/Microsoft.Web/connections/azureappservice",
+                "connectionId": "/subscriptions/9606f0a1-4502-4c86-8f75-660af3fdb023/resourceGroups/pplz-rg-iase-1d/providers/Microsoft.Web/connections/azureappservice",
                 "connectionName": "azureappservice",
-                "id": "/subscriptions/<sub-id>/providers/Microsoft.Web/locations/eastus2/managedApis/azureappservice"
+                "id": "/subscriptions/9606f0a1-4502-4c86-8f75-660af3fdb023/providers/Microsoft.Web/locations/eastus2/managedApis/azureappservice"
               }
             }
           }
