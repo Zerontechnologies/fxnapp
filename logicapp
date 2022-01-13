@@ -3,6 +3,7 @@
   "contentVersion": "1.0.0.0",
   "parameters": {
     "logicAppName": {
+      "defaultValue": "pplz-logic-amworkop-kvrotation-u",
       "type": "string",
       "minLength": 1,
       "maxLength": 80,
@@ -13,33 +14,6 @@
     "logicAppLocation": {
       "type": "string",
       "defaultValue": "[resourceGroup().location]",
-      "allowedValues": [
-        "[resourceGroup().location]",
-        "eastasia",
-        "southeastasia",
-        "centralus",
-        "eastus",
-        "eastus2",
-        "westus",
-        "northcentralus",
-        "southcentralus",
-        "northeurope",
-        "westeurope",
-        "japanwest",
-        "japaneast",
-        "brazilsouth",
-        "australiaeast",
-        "australiasoutheast",
-        "southindia",
-        "centralindia",
-        "westindia",
-        "canadacentral",
-        "canadaeast",
-        "uksouth",
-        "ukwest",
-        "westcentralus",
-        "westus2"
-      ],
       "metadata": {
         "description": "Location of the Logic App."
       }
@@ -52,111 +26,75 @@
       "type": "Microsoft.Logic/workflows",
       "location": "[parameters('logicAppLocation')]",
       "tags": {
-        "displayName": "LogicApp"
+        "AppCode": "amworkop",
+        "AppTaxonomy": "itarchitecture-amworkop-dev",
+        "BillingIdentifier": "2067",
+        "EnvironmentType": "dev"
+      },
+      "identity": {
+        "type": "SystemAssigned"
       },
       "apiVersion": "2016-06-01",
       "properties": {
+        "state": "Enabled",
         "integrationServiceEnvironment": {
-            "id": "/subscriptions/9606f0a1-4502-4c86-8f75-660af3fdb023/resourceGroups/pplz-rg-iase-1d/providers/Microsoft.Logic/integrationServiceEnvironments/pplzise"
+            "id": "/subscriptions/<sub id>/resourceGroups/<ise rg>/providers/Microsoft.Logic/integrationServiceEnvironments/<ise>"
           },
         "definition": {
           "$schema": "https://schema.management.azure.com/providers/Microsoft.Logic/schemas/2016-06-01/workflowdefinition.json#",
-          "actions": {
-            "CallbackURL_Check_": {
-              "type": "If",
-              "expression": "@not(empty(triggerBody()?['argCallbackURL']))",
-              "actions": {
-                "HTTP": {
-                  "type": "Http",
-                  "inputs": {
-                    "method": "POST",
-                    "uri": "@{triggerBody()?['argDocumentBaseURL']}@{triggerBody()?['argCallbackURL']}",
-                    "headers": {
-                      "Content-Type": "application/json"
-                    },
-                    "body": {
-                      "approvalType": "@{triggerBody()?['argApprovalType']}"
-                    }
-                  },
-                  "runAfter": {}
-                }
-              },
-              "runAfter": {}
-            },
-            "Response": {
-              "type": "Response",
-              "inputs": {
-                "statusCode": 202
-              },
-              "runAfter": {}
+          "contentVersion": "1.0.0.0",
+          "parameters": {
+            "$connections": {
+              "defaultValue": {},
+              "type": "Object"
             }
           },
-          "parameters": {},
           "triggers": {
-            "manual": {
-              "type": "Request",
-              "kind": "Http",
+            "Recurrence": {
+              "recurrence": {
+                "frequency": "Minute",
+                "interval": 5,
+                "timeZone": "Central Standard Time"
+              },
+              "evaluatedRecurrence": {
+                "frequency": "Minute",
+                "interval": 5,
+                "timeZone": "Central Standard Time"
+              },
+              "type": "Recurrence"
+            }
+          },
+          "actions": {
+            "Restart_web_app": {
+              "runAfter": {},
+              "type": "ApiConnection",
               "inputs": {
-                "schema": {
-                  "properties": {
-                    "argApprovalType": {
-                      "type": "string"
-                    },
-                    "argCallbackURL": {
-                      "type": "string"
-                    },
-                    "argContactCode": {
-                      "type": "string"
-                    },
-                    "argDocTypeId": {
-                      "type": "string"
-                    },
-                    "argDocumentCode": {
-                      "type": "string"
-                    },
-                    "argDocumentStatus": {
-                      "type": "string"
-                    },
-                    "argEventName": {
-                      "type": "string"
-                    },
-                    "argServiceBusUrl": {
-                      "type": "string"
-                    },
-                    "argUserExecutionContext": {
-                      "type": "string"
-                    },
-                    "argUserStatus": {
-                      "type": "string"
-                    },
-                    "argAdditionalText": {
-                      "type": "string"
-                    },
-                    "argHierarchyIds": {
-                      "type": "array"
-                    },
-                    "argDocumentBaseURL": {
-                      "type": "string"
-                    },
-                    "argDeploymentRegionId": {
-                      "type": "string"
-                    },
-                    "argDocumentBaseURLAuthKey": {
-                      "type": "string"
-                    },
-                    "BuyerPartnerCode": {
-                      "type": "string"
-                    }
-                  },
-                  "type": "object"
+                "host": {
+                  "connection": {
+                    "name": "@parameters('$connections')['azureappservice']['connectionId']"
+                  }
+                },
+                "method": "post",
+                "path": "/subscriptions/@{encodeURIComponent('<sub id>')}/resourcegroups/@{encodeURIComponent('<rg>')}/providers/Microsoft.Web/sites/@{encodeURIComponent('<webappname>')}/restart",
+                "queries": {
+                  "api-version": "2019-08-01"
                 }
               }
             }
           },
-          "contentVersion": "1.0.0.0",
           "outputs": {}
         },
-        "parameters": {}
+        "parameters": {
+          "$connections": {
+            "value": {
+              "azureappservice": {
+                "connectionId": "/subscriptions/<sub id>/resourceGroups/pplz-rg-iase-1d/providers/Microsoft.Web/connections/azureappservice",
+                "connectionName": "azureappservice",
+                "id": "/subscriptions/<sub id>/providers/Microsoft.Web/locations/eastus2/managedApis/azureappservice"
+              }
+            }
+          }
+        }
       }
     }
   ],
