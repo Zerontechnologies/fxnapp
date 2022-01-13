@@ -38,7 +38,7 @@
       "properties": {
         "state": "Enabled",
         "integrationServiceEnvironment": {
-            "id": "/subscriptions/<sub id>/resourceGroups/<ise rg>/providers/Microsoft.Logic/integrationServiceEnvironments/<ise>"
+            "id": "/subscriptions/<sub-id>/resourceGroups/<ise-rg-name>/providers/Microsoft.Logic/integrationServiceEnvironments/<ise-name>"
           },
         "definition": {
           "$schema": "https://schema.management.azure.com/providers/Microsoft.Logic/schemas/2016-06-01/workflowdefinition.json#",
@@ -75,7 +75,7 @@
                   }
                 },
                 "method": "post",
-                "path": "/subscriptions/@{encodeURIComponent('<sub id>')}/resourcegroups/@{encodeURIComponent('<rg>')}/providers/Microsoft.Web/sites/@{encodeURIComponent('<webappname>')}/restart",
+                "path": "/subscriptions/@{encodeURIComponent('<sub-id>')}/resourcegroups/@{encodeURIComponent('<ise-rg-name>')}/providers/Microsoft.Web/sites/@{encodeURIComponent('<webappname>')}/restart",
                 "queries": {
                   "api-version": "2019-08-01"
                 }
@@ -88,9 +88,9 @@
           "$connections": {
             "value": {
               "azureappservice": {
-                "connectionId": "/subscriptions/<sub id>/resourceGroups/pplz-rg-iase-1d/providers/Microsoft.Web/connections/azureappservice",
+                "connectionId": "/subscriptions/<sub-id>/resourceGroups/<ise-rg-name>/providers/Microsoft.Web/connections/azureappservice",
                 "connectionName": "azureappservice",
-                "id": "/subscriptions/<sub id>/providers/Microsoft.Web/locations/eastus2/managedApis/azureappservice"
+                "id": "/subscriptions/<sub-id>/providers/Microsoft.Web/locations/eastus2/managedApis/azureappservice"
               }
             }
           }
