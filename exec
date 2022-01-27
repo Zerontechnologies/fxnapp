@@ -1,0 +1,9 @@
+{
+            "type": "Microsoft.Web/sites/siteextensions",
+            "apiVersion": "2021-02-01",
+            "name": "[concat(parameters('executionServiceName'), '/Dynatrace')]",
+            "location": "East US 2",
+            "dependsOn": [
+                "[resourceId('Microsoft.Web/sites', parameters('executionServiceName'))]"
+            ]
+        }
