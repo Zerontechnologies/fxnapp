@@ -210,7 +210,7 @@
           "dependsOn": [
             "[concat('Microsoft.Web/Sites/', parameters('catalogServiceName'), '/Extensions/MSDeploy')]",
             "[concat('Microsoft.Web/sites/', parameters('catalogServiceName'))]",
-            "[concat('Microsoft.Web/Sites/', parameters('executionServiceName'), '/SiteExtensions/Dynatrace')]"
+            "[concat('Microsoft.Web/Sites/', parameters('catalogServiceName'), '/SiteExtensions/Dynatrace')]"
           ],
           "properties": {
             "inrule:repository:service:connectionString": "[concat('Server=tcp:', reference(concat('Microsoft.Sql/servers/', parameters('catalogSqlServerName'))).fullyQualifiedDomainName, ',1433;Database=', parameters('catalogSqlDbName'), ';User Id=', parameters('catalogSqlServerUsername'), ';Password=', parameters('catalogSqlServerPassword'), ';')]",
@@ -264,7 +264,7 @@
           "apiVersion": "2016-08-01",
           "dependsOn": [
             "[concat('Microsoft.Web/Sites/', parameters('catalogManagerServiceName'), '/Extensions/MSDeploy')]",
-            "[concat('Microsoft.Web/Sites/', parameters('executionServiceName'), '/SiteExtensions/Dynatrace')]",
+            "[concat('Microsoft.Web/Sites/', parameters('catalogManagerServiceName'), '/SiteExtensions/Dynatrace')]",
             "[concat('Microsoft.Web/sites/', parameters('catalogManagerServiceName'))]"
           ],
           "properties": {
