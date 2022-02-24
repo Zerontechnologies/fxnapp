@@ -159,7 +159,9 @@
           "properties": {
             "inrule:runtime:service:catalog:catalogServiceUri": "[parameters('catalogUri')]",
             "inrule:repository:licensing:licenseFolder": "D:\\home\\site\\wwwroot",
-            "inrule:logging:level": "Warn"
+            "inrule:logging:level": "Warn",
+            "DT_TENANT": "<id>",
+            "DT_API_TOKEN": "<token>"
           }
         },
         {
