@@ -70,6 +70,18 @@
       "metadata": {
         "description": "URI for your InRule Rule Catalog service, should follow this format: https://{Context}/Service.svc, with {Context} being replaced with the base catalog service URI."
       }
+    },
+    "dttenant": {
+      "type": "string",
+      "metadata": {
+        "description": "Dynatrace Tenant ID"
+      }
+    },
+    "dttoken": {
+      "type": "string",
+      "metadata": {
+        "description": "Dynatrace Token"
+      }
     }
   },
   "variables": {
@@ -160,8 +172,8 @@
             "inrule:runtime:service:catalog:catalogServiceUri": "[parameters('catalogUri')]",
             "inrule:repository:licensing:licenseFolder": "D:\\home\\site\\wwwroot",
             "inrule:logging:level": "Warn",
-            "DT_TENANT": "<id>",
-            "DT_API_TOKEN": "<token>"
+            "DT_TENANT": "[parameters('dttenant')]",
+            "DT_API_TOKEN": "[parameters('dttoken')]"
           }
         },
         {
