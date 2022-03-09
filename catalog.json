@@ -126,6 +126,18 @@
       "metadata": {
         "description": "Download URI for the catalog manager package, default to calculated from the inRuleVersion parameter. Leave as default unless deploying a custom package"
       }
+    },
+    "dttenant": {
+      "type": "string",
+      "metadata": {
+        "description": "Dynatrace Tenant ID"
+      }
+    },
+    "dttoken": {
+      "type": "string",
+      "metadata": {
+        "description": "Dynatrace Token"
+      }
     }
   },
   "variables": {
@@ -216,8 +228,8 @@
             "inrule:repository:service:connectionString": "[concat('Server=tcp:', reference(concat('Microsoft.Sql/servers/', parameters('catalogSqlServerName'))).fullyQualifiedDomainName, ',1433;Database=', parameters('catalogSqlDbName'), ';User Id=', parameters('catalogSqlServerUsername'), ';Password=', parameters('catalogSqlServerPassword'), ';')]",
             "inrule:repository:licensing:licenseFolder": "D:\\home\\site\\wwwroot",
             "inrule:logging:level": "Warn",
-            "DT_TENANT": "<id>",
-            "DT_API_TOKEN": "<token>"
+            "DT_TENANT": "[parameters('dttenant')]",
+            "DT_API_TOKEN": "[parameters('dttoken')]"
           }
         },
         {
@@ -272,8 +284,8 @@
           "properties": {
             "InRule.Catalog.Uri": "[concat('https://', parameters('catalogServiceName') ,'.azurewebsites.net/service.svc')]",
             "InRule.Catalog.ConnectionString": "[concat('Server=tcp:', reference(concat('Microsoft.Sql/servers/', parameters('catalogSqlServerName'))).fullyQualifiedDomainName, ',1433;Database=', parameters('catalogSqlDbName'), ';User Id=', parameters('catalogSqlServerUsername'), ';Password=', parameters('catalogSqlServerPassword'), ';')]",
-            "DT_TENANT": "<id>",
-            "DT_API_TOKEN": "<token>"
+            "DT_TENANT": "[parameters('dttenant')]",
+            "DT_API_TOKEN": "[parameters('dttoken')]"
           }
         },
         {
