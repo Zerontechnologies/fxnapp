@@ -1,0 +1,55 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentParameters.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "catalogServiceName": {
+      "value": ""
+    },
+    "catalogManagerServiceName": {
+      "value": ""
+    },
+    "catalogServicePlanSkuName": {
+      "value": "B1"
+    },
+    "catalogSqlServerName": {
+      "value": ""
+    },
+    "catalogSqlServerUsername": {
+      "value": ""
+    },
+    "catalogSqlServerPassword": {
+      "value": ""
+    },
+    "catalogSqlDbName": {
+      "value": ""
+    },
+    "catalogSqlDbEdition": {
+      "value": "Basic"
+    },
+    "catalogSqlDbPerformanceLevel": {
+      "value": "Basic"
+    },
+    "inRuleVersion": {
+      "value": "5.7.2"
+    },
+    "catalogServicePlanName": {
+      "value": ""
+    },
+    "dttenant": {
+      "reference": {
+        "keyvault": {
+          "id": "/subscriptions/<sub-id>/resourceGroups/RG/providers/Microsoft.KeyVault/vaults/testkyvu"
+        },
+        "secretName": "dtTenant"
+      }
+    },
+    "dttoken": {
+      "reference": {
+        "keyvault": {
+          "id": "/subscriptions/<sub-id>/resourceGroups/RG/providers/Microsoft.KeyVault/vaults/testkyvu"
+        },
+        "secretName": "dtAPISecret"
+      }
+    }
+  }
+}
