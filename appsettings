@@ -1,0 +1,36 @@
+- task: AzureAppServiceSettings@1
+  displayName: Azure App Service Settings
+  inputs:
+    azureSubscription: $(azureSubscription)
+    appName: $(WebApp_Name)
+   # To deploy the settings on a slot, provide slot name as below. By default, the settings would be applied to the actual Web App (Production slot)
+   # slotName: staging
+    appSettings: |
+      [
+        {
+          "name": "APPINSIGHTS_INSTRUMENTATIONKEY",
+          "value": "$(Key)",
+          "slotSetting": false
+        },
+        {
+          "name": "MYSQL_DATABASE_NAME",
+          "value": "$(DB_Name)", 
+          "slotSetting": false
+        }
+      ]
+    generalSettings: |
+      [
+        {
+          "alwaysOn": true,
+          "webSocketsEnabled": false
+        }
+      ]
+    connectionStrings: |
+      [
+        {
+          "name": "MysqlCredentials",
+          "value": "$(MySQl_ConnectionString)",
+          "type": "MySql",
+          "slotSetting": false
+        }
+      ]
