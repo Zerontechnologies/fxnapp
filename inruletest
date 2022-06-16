@@ -173,147 +173,6 @@
       }
     },
     {
-      "condition": "[parameters('createOrUpdateCatalogServicePlan')]",
-      "name": "AppServicePlanTemplate",
-      "apiVersion": "2017-05-10",
-      "type": "Microsoft.Resources/deployments",
-      "resourceGroup": "[parameters('servicePlanResourceGroupName')]",
-      "properties": {
-        "mode": "Incremental",
-        "template": {
-          "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
-          "contentVersion": "1.0.0.0",
-          "resources": [
-            {
-              "name": "[variables('catalogServicePlanName')]",
-              "type": "Microsoft.Web/serverfarms",
-              "apiVersion": "2016-09-01",
-              "location": "[resourceGroup().location]",
-              "properties": {
-                "name": "[variables('catalogServicePlanName')]"
-              },
-              "sku": {
-                "name": "[parameters('catalogServicePlanSkuName')]"
-              }
-            }
-          ]
-        }
-      }
-    },
-    {
-      "name": "[parameters('catalogServiceName')]",
-      "type": "Microsoft.Web/sites",
-      "apiVersion": "2016-08-01",
-      "location": "[resourceGroup().location]",
-      "dependsOn": [
-        "[resourceId(parameters('servicePlanResourceGroupName'), 'Microsoft.Resources/deployments', 'AppServicePlanTemplate')]"
-      ],
-      "tags": {
-        "[concat('hidden-related:', resourceId(parameters('servicePlanResourceGroupName'), 'Microsoft.Web/serverfarms', variables('catalogServicePlanName')))]": "Resource"
-      },
-      "properties": {
-        "serverFarmId": "[resourceId(parameters('servicePlanResourceGroupName'), 'Microsoft.Web/serverfarms', variables('catalogServicePlanName'))]",
-        "siteConfig": {
-          "use32BitWorkerProcess": "[variables('use32Bit')]"
-        }
-      },
-      "resources": [
-        {
-          "name": "MSDeploy",
-          "type": "extensions",
-          "apiVersion": "2016-08-01",
-          "dependsOn": [
-            "[concat('Microsoft.Web/sites/', parameters('catalogServiceName'))]"
-          ],
-          "properties": {
-            "packageUri": "[parameters('packageUri')]"
-          }
-        },
-        {
-            "type": "Microsoft.Web/sites/siteextensions",
-            "apiVersion": "2021-02-01",
-            "name": "[concat(parameters('catalogServiceName'), '/Dynatrace')]",
-            "location": "East US 2",
-            "dependsOn": [
-                "[resourceId('Microsoft.Web/sites', parameters('catalogServiceName'))]"
-            ]
-        },
-        {
-          "name": "appsettings",
-          "type": "config",
-          "apiVersion": "2016-08-01",
-          "dependsOn": [
-            "[concat('Microsoft.Web/Sites/', parameters('catalogServiceName'), '/Extensions/MSDeploy')]",
-            "[concat('Microsoft.Web/Sites/', parameters('catalogServiceName'), '/SiteExtensions/Dynatrace')]",
-            "[concat('Microsoft.Web/sites/', parameters('catalogServiceName'))]"
-          ],
-          "properties": {
-            "inrule:repository:service:connectionString": "[concat('Server=tcp:', reference(concat('Microsoft.Sql/servers/', parameters('catalogSqlServerName'))).fullyQualifiedDomainName, ',1433;Database=', parameters('catalogSqlDbName'), ';User Id=', parameters('catalogSqlServerUsername'), ';Password=', parameters('catalogSqlServerPassword'), ';')]",
-            "inrule:repository:licensing:licenseFolder": "D:\\home\\site\\wwwroot",
-            "inrule:logging:level": "Warn",
-            "DT_TENANT": "[parameters('dttenant')]",
-            "DT_API_TOKEN": "[parameters('dttoken')]"
-          }
-        }
-      ]
-    },
-    {
-      "name": "[parameters('catalogManagerServiceName')]",
-      "type": "Microsoft.Web/sites",
-      "apiVersion": "2016-08-01",
-      "location": "[resourceGroup().location]",
-      "dependsOn": [
-        "[resourceId(parameters('servicePlanResourceGroupName'), 'Microsoft.Resources/deployments', 'AppServicePlanTemplate')]"
-      ],
-      "tags": {
-        "[concat('hidden-related:', resourceId(parameters('servicePlanResourceGroupName'), 'Microsoft.Web/serverfarms', parameters('catalogServicePlanName')))]": "Resource"
-      },
-      "properties": {
-        "serverFarmId": "[resourceId(parameters('servicePlanResourceGroupName'), 'Microsoft.Web/serverfarms', variables('catalogServicePlanName'))]",
-        "siteConfig": {
-          "use32BitWorkerProcess": "[variables('use32Bit')]"
-        }
-      },
-      "resources": [
-        {
-          "name": "MSDeploy",
-          "type": "extensions",
-          "apiVersion": "2016-08-01",
-          "dependsOn": [
-            "[concat('Microsoft.Web/sites/', parameters('catalogManagerServiceName'))]"
-          ],
-          "properties": {
-            "packageUri": "[parameters('managerPackageUri')]"
-          }
-        },
-        {
-            "type": "Microsoft.Web/sites/siteextensions",
-            "apiVersion": "2021-02-01",
-            "name": "[concat(parameters('catalogManagerServiceName'), '/Dynatrace')]",
-            "location": "East US 2",
-            "dependsOn": [
-                "[resourceId('Microsoft.Web/sites', parameters('catalogManagerServiceName'))]"
-            ]
-        },
-        {
-          "name": "appsettings",
-          "type": "config",
-          "apiVersion": "2016-08-01",
-          "dependsOn": [
-            "[concat('Microsoft.Web/Sites/', parameters('catalogManagerServiceName'), '/Extensions/MSDeploy')]",
-            "[concat('Microsoft.Web/Sites/', parameters('catalogManagerServiceName'), '/SiteExtensions/Dynatrace')]",
-            "[concat('Microsoft.Web/sites/', parameters('catalogManagerServiceName'))]"
-          ],
-          "properties": {
-            "InRule.Catalog.Uri": "[concat('https://', parameters('catalogServiceName') ,'.azurewebsites.net/service.svc')]",
-            "InRule.Catalog.ConnectionString": "[concat('Server=tcp:', reference(concat('Microsoft.Sql/servers/', parameters('catalogSqlServerName'))).fullyQualifiedDomainName, ',1433;Database=', parameters('catalogSqlDbName'), ';User Id=', parameters('catalogSqlServerUsername'), ';Password=', parameters('catalogSqlServerPassword'), ';')]",
-            "DT_TENANT": "[parameters('dttenant')]",
-            "DT_API_TOKEN": "[parameters('dttoken')]"
-          }
-        }
-      ]
-    },
-    {
       "condition": "[parameters('createOrUpdateSQLCatalog')]",
       "name": "SQLTemplate",
       "apiVersion": "2017-05-10",
@@ -336,41 +195,183 @@
               "properties": {
                 "administratorLogin": "[parameters('catalogSqlServerUsername')]",
                 "administratorLoginPassword": "[parameters('catalogSqlServerPassword')]"
-              },
-              "resources": [
-                {
-                  "name": "AllowOnly",
-                  "type": "firewallrules",
-                  "location": "[resourceGroup().location]",
-                  "apiVersion": "2014-04-01-preview",
-                  "dependsOn": [
-                    "[resourceId('Microsoft.Sql/servers', parameters('catalogSqlServerName'))]"
-                  ],
-                  "properties": {
-                    "startIpAddress": "167.155.6.2",
-                    "endIpAddress": "167.155.6.2"
-                  }
-                },
-                {
-                  "name": "[parameters('catalogSqlDbName')]",
-                  "type": "databases",
-                  "resourceGroup" : "[parameters('catalogSqlResourceGroupName')]",
-                  "location": "[resourceGroup().location]",
-                  "apiVersion": "2014-04-01-preview",
-                  "dependsOn": [
-                    "[resourceId('Microsoft.Sql/servers', parameters('catalogSqlServerName'))]"
-                  ],
-                  "properties": {
-                    "edition": "[parameters('catalogSqlDbEdition')]",
-                    "requestedServiceObjectiveName": "[parameters('catalogSqlDbPerformanceLevel')]"
-                  }
-                }
-              ]
+              }
+              // ,
+            // "resources": [
+            //     {
+            //       "name": "AllowOnly",
+            //       "type": "firewallrules",
+            //       "location": "[resourceGroup().location]",
+            //       "apiVersion": "2014-04-01-preview",
+            //       "dependsOn": [
+            //         "[resourceId('Microsoft.Sql/servers/', parameters('catalogSqlServerName'))]"
+            //       ],
+            //       "properties": {
+            //         "startIpAddress": "167.155.6.2",
+            //         "endIpAddress": "167.155.6.2"
+            //       }
+            //     },
+            //     {
+            //       "name": "[parameters('catalogSqlDbName')]",
+            //       "type": "databases",
+            //       "location": "[resourceGroup().location]",
+            //       "apiVersion": "2014-04-01-preview",
+            //       "dependsOn": [
+            //         "[resourceId('Microsoft.Sql/servers/', parameters('catalogSqlServerName'))]"
+            //       ],
+            //       "properties": {
+            //         "edition": "[parameters('catalogSqlDbEdition')]",
+            //         "requestedServiceObjectiveName": "[parameters('catalogSqlDbPerformanceLevel')]"
+            //       }
+            //     }
+              // ]
             }
           ]
         }
       }
     }
+    // ,
+    // {
+    //   "condition": "[parameters('createOrUpdateCatalogServicePlan')]",
+    //   "name": "AppServicePlanTemplate",
+    //   "apiVersion": "2017-05-10",
+    //   "type": "Microsoft.Resources/deployments",
+    //   "resourceGroup": "[parameters('servicePlanResourceGroupName')]",
+    //   "properties": {
+    //     "mode": "Incremental",
+    //     "template": {
+    //       "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+    //       "contentVersion": "1.0.0.0",
+    //       "resources": [
+    //         {
+    //           "name": "[variables('catalogServicePlanName')]",
+    //           "type": "Microsoft.Web/serverfarms",
+    //           "apiVersion": "2016-09-01",
+    //           "location": "[resourceGroup().location]",
+    //           "properties": {
+    //             "name": "[variables('catalogServicePlanName')]"
+    //           },
+    //           "sku": {
+    //             "name": "[parameters('catalogServicePlanSkuName')]"
+    //           }
+    //         }
+    //       ]
+    //     }
+    //   }
+    // },
+    // {
+    //   "name": "[parameters('catalogServiceName')]",
+    //   "type": "Microsoft.Web/sites",
+    //   "apiVersion": "2016-08-01",
+    //   "location": "[resourceGroup().location]",
+    //   "dependsOn": [
+    //     "[resourceId(parameters('servicePlanResourceGroupName'), 'Microsoft.Resources/deployments', 'AppServicePlanTemplate')]"
+    //   ],
+    //   "tags": {
+    //     "[concat('hidden-related:', resourceId(parameters('servicePlanResourceGroupName'), 'Microsoft.Web/serverfarms', variables('catalogServicePlanName')))]": "Resource"
+    //   },
+    //   "properties": {
+    //     "serverFarmId": "[resourceId(parameters('servicePlanResourceGroupName'), 'Microsoft.Web/serverfarms', variables('catalogServicePlanName'))]",
+    //     "siteConfig": {
+    //       "use32BitWorkerProcess": "[variables('use32Bit')]"
+    //     }
+    //   },
+    //   "resources": [
+    //     {
+    //       "name": "MSDeploy",
+    //       "type": "extensions",
+    //       "apiVersion": "2016-08-01",
+    //       "dependsOn": [
+    //         "[concat('Microsoft.Web/sites/', parameters('catalogServiceName'))]"
+    //       ],
+    //       "properties": {
+    //         "packageUri": "[parameters('packageUri')]"
+    //       }
+    //     },
+    //     {
+    //         "type": "Microsoft.Web/sites/siteextensions",
+    //         "apiVersion": "2021-02-01",
+    //         "name": "[concat(parameters('catalogServiceName'), '/Dynatrace')]",
+    //         "location": "East US 2",
+    //         "dependsOn": [
+    //             "[resourceId('Microsoft.Web/sites', parameters('catalogServiceName'))]"
+    //         ]
+    //     },
+    //     {
+    //       "name": "appsettings",
+    //       "type": "config",
+    //       "apiVersion": "2016-08-01",
+    //       "dependsOn": [
+    //         "[concat('Microsoft.Web/Sites/', parameters('catalogServiceName'), '/Extensions/MSDeploy')]",
+    //         "[concat('Microsoft.Web/Sites/', parameters('catalogServiceName'), '/SiteExtensions/Dynatrace')]",
+    //         "[concat('Microsoft.Web/sites/', parameters('catalogServiceName'))]"
+    //       ],
+    //       "properties": {
+    //         "inrule:repository:service:connectionString": "[concat('Server=tcp:', reference(concat('Microsoft.Sql/servers/', parameters('catalogSqlServerName'))).fullyQualifiedDomainName, ',1433;Database=', parameters('catalogSqlDbName'), ';User Id=', parameters('catalogSqlServerUsername'), ';Password=', parameters('catalogSqlServerPassword'), ';')]",
+    //         "inrule:repository:licensing:licenseFolder": "D:\\home\\site\\wwwroot",
+    //         "inrule:logging:level": "Warn",
+    //         "DT_TENANT": "[parameters('dttenant')]",
+    //         "DT_API_TOKEN": "[parameters('dttoken')]"
+    //       }
+    //     }
+    //   ]
+    // },
+    // {
+    //   "name": "[parameters('catalogManagerServiceName')]",
+    //   "type": "Microsoft.Web/sites",
+    //   "apiVersion": "2016-08-01",
+    //   "location": "[resourceGroup().location]",
+    //   "dependsOn": [
+    //     "[resourceId(parameters('servicePlanResourceGroupName'), 'Microsoft.Resources/deployments', 'AppServicePlanTemplate')]"
+    //   ],
+    //   "tags": {
+    //     "[concat('hidden-related:', resourceId(parameters('servicePlanResourceGroupName'), 'Microsoft.Web/serverfarms', parameters('catalogServicePlanName')))]": "Resource"
+    //   },
+    //   "properties": {
+    //     "serverFarmId": "[resourceId(parameters('servicePlanResourceGroupName'), 'Microsoft.Web/serverfarms', variables('catalogServicePlanName'))]",
+    //     "siteConfig": {
+    //       "use32BitWorkerProcess": "[variables('use32Bit')]"
+    //     }
+    //   },
+    //   "resources": [
+    //     {
+    //       "name": "MSDeploy",
+    //       "type": "extensions",
+    //       "apiVersion": "2016-08-01",
+    //       "dependsOn": [
+    //         "[concat('Microsoft.Web/sites/', parameters('catalogManagerServiceName'))]"
+    //       ],
+    //       "properties": {
+    //         "packageUri": "[parameters('managerPackageUri')]"
+    //       }
+    //     },
+    //     {
+    //         "type": "Microsoft.Web/sites/siteextensions",
+    //         "apiVersion": "2021-02-01",
+    //         "name": "[concat(parameters('catalogManagerServiceName'), '/Dynatrace')]",
+    //         "location": "East US 2",
+    //         "dependsOn": [
+    //             "[resourceId('Microsoft.Web/sites', parameters('catalogManagerServiceName'))]"
+    //         ]
+    //     },
+    //     {
+    //       "name": "appsettings",
+    //       "type": "config",
+    //       "apiVersion": "2016-08-01",
+    //       "dependsOn": [
+    //         "[concat('Microsoft.Web/Sites/', parameters('catalogManagerServiceName'), '/Extensions/MSDeploy')]",
+    //         "[concat('Microsoft.Web/Sites/', parameters('catalogManagerServiceName'), '/SiteExtensions/Dynatrace')]",
+    //         "[concat('Microsoft.Web/sites/', parameters('catalogManagerServiceName'))]"
+    //       ],
+    //       "properties": {
+    //         "InRule.Catalog.Uri": "[concat('https://', parameters('catalogServiceName') ,'.azurewebsites.net/service.svc')]",
+    //         "InRule.Catalog.ConnectionString": "[concat('Server=tcp:', reference(concat('Microsoft.Sql/servers/', parameters('catalogSqlServerName'))).fullyQualifiedDomainName, ',1433;Database=', parameters('catalogSqlDbName'), ';User Id=', parameters('catalogSqlServerUsername'), ';Password=', parameters('catalogSqlServerPassword'), ';')]",
+    //         "DT_TENANT": "[parameters('dttenant')]",
+    //         "DT_API_TOKEN": "[parameters('dttoken')]"
+    //       }
+    //     }
+    //   ]
+    // }
   ],          
   "outputs": {}
 }
