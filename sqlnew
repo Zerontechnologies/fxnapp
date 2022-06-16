@@ -2,11 +2,48 @@
   "$schema": "http://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
   "contentVersion": "1.0.0.0",
   "parameters": {
-    "createOrUpdateCatalogSQL": {
+    "createOrUpdateCatalogServicePlan": {
       "type": "bool",
-      "defaultValue": true,
+      "defaultValue": false,
       "metadata": {
         "description": "If set to false, provide the name and resource group of an existing service plan in the 'catalogServicePlanName' and 'servicePlanResourceGroupName' parameters. Otherwise a new plan will be created with the supplied name"
+      }
+    },
+    "catalogServicePlanName": {
+      "type": "string",
+      "defaultValue": "pplz-amworkop-asp-q",
+      "metadata": {
+        "description": "Name for the App Service Plan, defaulting to the value of the App Service's name with 'Plan' appended to the end"
+      }
+    },
+    "catalogServicePlanSkuName": {
+      "type": "string",
+      "defaultValue": "B1",
+      "allowedValues": [
+        "F1",
+        "D1",
+        "B1",
+        "B2",
+        "B3",
+        "S1",
+        "S2",
+        "S3",
+        "P1",
+        "P2",
+        "P3",
+        "P4",
+        "I1",
+        "I2"
+      ],
+      "metadata": {
+        "description": "Describes plan's pricing tier and capacity. Check details at https://azure.microsoft.com/en-us/pricing/details/app-service/"
+      }
+    },
+    "servicePlanResourceGroupName": {
+      "type": "string",
+      "defaultValue": "pplz-amworkop-rg-q",
+      "metadata": {
+        "description": "Optional name of the resource group for the existing app service plan. If creating a new plan, leave as the default value"
       }
     },
     "sqlResourceGroupName": {
@@ -105,8 +142,8 @@
       }
     },
     {
-      "condition": "[parameters('createOrUpdateSQL')]",
-      "name": "SQLTemplate",
+      "condition": "[parameters('createOrUpdateCatalogServicePlan')]",
+      "name": "AppServicePlanTemplate",
       "apiVersion": "2017-05-10",
       "type": "Microsoft.Resources/deployments",
       "resourceGroup": "[parameters('sqlResourceGroupName')]",
@@ -115,7 +152,20 @@
         "template": {
           "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
           "contentVersion": "1.0.0.0",
-          "resources": []
+          "resources": [
+            // {
+            //   "name": "[variables('catalogServicePlanName')]",
+            //   "type": "Microsoft.Web/serverfarms",
+            //   "apiVersion": "2016-09-01",
+            //   "location": "[resourceGroup().location]",
+            //   "properties": {
+            //     "name": "[variables('catalogServicePlanName')]"
+            //   },
+            //   "sku": {
+            //     "name": "[parameters('catalogServicePlanSkuName')]"
+            //   }
+            // }
+          ]
         }
       }
     },
