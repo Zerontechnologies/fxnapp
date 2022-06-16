@@ -16,35 +16,35 @@
         "description": "The administrator password of the SQL Server."
       }
     },
-    "transparentDataEncryption": {
-      "type": "string",
-      "allowedValues": [
-        "Enabled",
-        "Disabled"
-      ],
-      "defaultValue": "Enabled",
-      "metadata": {
-        "description": "Enable or disable Transparent Data Encryption (TDE) for the database."
-      }
-    },
     "location": {
       "type": "string",
       "defaultValue": "[resourceGroup().location]",
       "metadata": {
         "description": "Location for all resources."
       }
+    },
+    "sqlServerName": {
+        "type": "string",
+        "defaultValue": "uchdnserver",
+        "metadata": {
+            "description": "Sql server name"
+        }
+    },
+    "databaseName": {
+        "type": "string",
+        "defaultValue": "uchsdb",
+        "metadata": {
+            "description": "Database Name"
+        }
     }
   },
   "variables": {
-    "sqlServerName": "[concat('sqlserver', uniqueString(subscription().id, resourceGroup().id))]",
-    "databaseName": "sample-db-with-tde",
     "databaseEdition": "Basic",
-    "databaseCollation": "SQL_Latin1_General_CP1_CI_AS",
-    "databaseServiceObjectiveName": "Basic"
+    "databaseCollation": "SQL_Latin1_General_CP1_CI_AS"
   },
   "resources": [
     {
-      "name": "[variables('sqlServerName')]",
+      "name": "[parameters('sqlServerName')]",
       "type": "Microsoft.Sql/servers",
       "apiVersion": "2020-02-02-preview",
       "location": "[parameters('location')]",
@@ -58,7 +58,7 @@
       },
       "resources": [
         {
-          "name": "[variables('databaseName')]",
+          "name": "[parameters('databaseName')]",
           "type": "databases",
           "apiVersion": "2020-02-02-preview",
           "location": "[parameters('location')]",
@@ -67,25 +67,10 @@
           },
           "properties": {
             "edition": "[variables('databaseEdition')]",
-            "collation": "[variables('databaseCollation')]",
-            "requestedServiceObjectiveName": "[variables('databaseServiceObjectiveName')]"
+            "collation": "[variables('databaseCollation')]"
           },
           "dependsOn": [
-            "[variables('sqlServerName')]"
-          ],
-          "resources": [
-            {
-              "comments": "Transparent Data Encryption",
-              "name": "current",
-              "type": "transparentDataEncryption",
-              "apiVersion": "2017-03-01-preview",
-              "properties": {
-                "status": "[parameters('transparentDataEncryption')]"
-              },
-              "dependsOn": [
-                "[variables('databaseName')]"
-              ]
-            }
+            "[parameters('sqlServerName')]"
           ]
         },
         {
@@ -98,7 +83,7 @@
             "startIpAddress": "0.0.0.0"
           },
           "dependsOn": [
-            "[variables('sqlServerName')]"
+            "[parameters('sqlServerName')]"
           ]
         }
       ]
@@ -107,11 +92,11 @@
   "outputs": {
     "sqlServerFqdn": {
       "type": "string",
-      "value": "[reference(resourceId('Microsoft.Sql/servers/', variables('sqlServerName'))).fullyQualifiedDomainName]"
+      "value": "[reference(resourceId('Microsoft.Sql/servers/', parameters('sqlServerName'))).fullyQualifiedDomainName]"
     },
     "databaseName": {
       "type": "string",
-      "value": "[variables('databaseName')]"
+      "value": "[parameters('databaseName')]"
     }
   }
 }
