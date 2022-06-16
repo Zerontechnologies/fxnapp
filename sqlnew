@@ -105,7 +105,7 @@
       }
     },
     {
-      "condition": "[parameters('createOrUpdateSQL')]",
+      "condition": "[parameters('createOrUpdateCatalogSQL')]",
       "name": "SQLTemplate",
       "apiVersion": "2017-05-10",
       "type": "Microsoft.Resources/deployments",
